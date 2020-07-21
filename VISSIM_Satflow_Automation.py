@@ -2,6 +2,7 @@
 import pathlib
 import pandas as pd
 import time
+import openpyxl
 
 maximum_headway_accepted = int(input("Enter the maximum headway accepted as an integer: "))
 start = time.time()
@@ -92,7 +93,8 @@ end = time.time()
 print(end - start)
 
 # Group the same stoplines togther using the file suffix and get the average.
-print((results.groupby("ID").mean().round(decimals=0)))
-# print(df1.head(50))
+results= results.groupby("ID").mean().round(decimals=0)
+
+results.to_excel("Satflow_results.xlsx")
 # print("Count: " + str(count))
 # print("Total: " + str(cumulative_discharge_rate))
