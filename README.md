@@ -7,3 +7,5 @@ The saturation flow per stopline in the VISSIM model will be evaluated.
 Ensure that all the Special evaluation files are in a folder on the same level, relative to the .py file. Name this folder "Special_eval_files".
 
 The only input is the maximum headway accepted.
+
+The output is an Excel file. If the script is re-run, the Excel file will be overwritten.
