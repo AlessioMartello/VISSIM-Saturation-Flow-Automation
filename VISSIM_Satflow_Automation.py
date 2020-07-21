@@ -1,15 +1,17 @@
 # Import relevant modules
+from datetime import datetime
 import pathlib
 import pandas as pd
 import time
 import openpyxl
 
 maximum_headway_accepted = int(input("Enter the maximum headway accepted as an integer: "))
+
 start = time.time()
 results = pd.DataFrame(columns=['ID', "Saturation_flow"])
 for path in pathlib.Path("Special_eval_files").iterdir():
     try:
-        my_cols = [str(col) for col in range(60)]
+        my_cols = [str(col) for col in range(100)]
         use_cols = my_cols[3:]  # We are only concerned with the fourth column, onwards.
 
         # Read the file, delimeter set as space separated
@@ -85,16 +87,18 @@ for path in pathlib.Path("Special_eval_files").iterdir():
         # print(str(path)[-3:] + " Satflow: " + str(sat_flow))
 
         # Append the results per stop-line (file suffix) to a dataFrame
-        results = results.append({'ID': str(path)[-3:], "Saturation_flow": sat_flow}, ignore_index=True)
-
+        results = results.append({'ID': str(path)[-3:], "Saturation_flow": sat_flow, "Number of measurements": discharge_rate_count}, ignore_index=True)
     except:
         print("Error on file: " + str(path))
 end = time.time()
 print(end - start)
 
-# Group the same stoplines togther using the file suffix and get the average.
-results= results.groupby("ID").mean().round(decimals=0)
+# Group the same stop-lines together using the file suffix and get the average of the Saturation flows and the total
+# number of measurements for that saturation flow.
+results = results.groupby("ID").agg({"Saturation_flow": "mean", "Number of measurements": "sum"})
 
-results.to_excel("Satflow_results.xlsx")
+now = datetime.now()
+
+results.to_excel("Satflow_results_" + now.strftime("%d-%m_%H.%M") + ".xlsx")
 # print("Count: " + str(count))
 # print("Total: " + str(cumulative_discharge_rate))
