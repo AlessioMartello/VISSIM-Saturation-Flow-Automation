@@ -41,7 +41,7 @@ for path in pathlib.Path("Special_eval_files").iterdir():
             df[col_name] = pd.to_numeric(df[col_name])
 
         # The Macro doesnt count anything above the maximum acceptable headway. So set anything above this to zero,
-        # so it gets ingored.
+        # so it gets ignored.
         df[df > maximum_headway_accepted] = 0
 
         # The Macro rounds the values. Replicate this.
