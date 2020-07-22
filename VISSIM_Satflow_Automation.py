@@ -3,6 +3,7 @@ from datetime import datetime
 import pathlib
 import pandas as pd
 import time
+import numpy as np
 import openpyxl
 
 maximum_headway_accepted = int(input("Enter the maximum headway accepted as an integer: "))
@@ -45,7 +46,8 @@ for path in pathlib.Path("Special_eval_files").iterdir():
         df[df > maximum_headway_accepted] = 0
 
         # The Macro rounds the values. Replicate this.
-        df = df.round()
+        df = df+0.5
+        df=df.apply(np.floor)
 
         # Convert to numpy array for easier and faster manipulation.
         df = df.to_numpy()
@@ -56,8 +58,8 @@ for path in pathlib.Path("Special_eval_files").iterdir():
         vehicle_position_index_row = number_of_rows - 3
 
         # Loop through each row. If the value (discharge rate) is over the headway limit, go to the next line.
-        # Otherwise increase the count and add this discharge rate to the cumulative_discharge_rate. Skip the row
-        # containing un-useful data and after this row, shift the loop one column to the right, to account for the
+        # Otherwise increase the count and add this discharge rate to the cumulative_discharge_rate. Skip the two rows
+        # containing un-useful data and between these rows, start the loop one column to the right, to account for the
         # indent in the data.
         cumulative_discharge_rate = 0
         discharge_rate_count = 0
@@ -84,7 +86,7 @@ for path in pathlib.Path("Special_eval_files").iterdir():
         # Perform the Saturation Flow calculation
         sat_flow = round(3600 / (cumulative_discharge_rate / discharge_rate_count))
 
-        # print(str(path)[-3:] + " Satflow: " + str(sat_flow))
+        print(str(path) +" Count: " + str(discharge_rate_count) + " Total: " +str(cumulative_discharge_rate) + ", Satflow: " + str(sat_flow))
 
         # Append the results per stop-line (file suffix) to a dataFrame
         results = results.append({'ID': str(path)[-3:], "Saturation_flow": sat_flow, "Number of measurements": discharge_rate_count}, ignore_index=True)
@@ -100,5 +102,4 @@ results = results.groupby("ID").agg({"Saturation_flow": "mean", "Number of measu
 now = datetime.now()
 
 results.to_excel("Satflow_results_" + now.strftime("%d-%m_%H.%M") + ".xlsx")
-# print("Count: " + str(count))
-# print("Total: " + str(cumulative_discharge_rate))
+
