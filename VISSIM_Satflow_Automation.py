@@ -41,14 +41,15 @@ for path in pathlib.Path("Special_eval_files").iterdir():
         for col_name in col_names:
             df[col_name] = pd.to_numeric(df[col_name])
 
-        # The Macro doesnt count anything above the maximum acceptable headway. So set anything above this to zero,
-        # so it gets ignored.
+        # The Macro doesnt count anything above the maximum acceptable headway. So set anything above this to -1,
+        # so it gets ignored. The same goes for pre-existing zeros.
         df[df > maximum_headway_accepted] = -1
         df[df == 0] = -1
 
-        # The Macro rounds the values. Replicate this.
-        df = df+0.5
-        df=df.apply(np.floor)
+        # The Macro rounds the values before performing calculations. Integers containing exactly 0.5 are rounded down.
+        # Otherwise, round to the nearest integer
+        df = df + 0.4999
+        df = df.apply(np.floor)
 
         # Convert to numpy array for easier and faster manipulation.
         df = df.to_numpy()
