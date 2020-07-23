@@ -43,7 +43,7 @@ for path in pathlib.Path("Special_eval_files").iterdir():
 
         # The Macro doesnt count anything above the maximum acceptable headway. So set anything above this to -1,
         # so it gets ignored. The same goes for pre-existing zeros.
-        df[df > maximum_headway_accepted] = -1
+        df[df >= maximum_headway_accepted] = -1
         df[df == 0] = -1
 
         # The Macro rounds the values before performing calculations. Integers containing exactly 0.5 are rounded down.
