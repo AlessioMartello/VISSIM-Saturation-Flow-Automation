@@ -29,7 +29,7 @@ for path in pathlib.Path("Special_eval_files").iterdir():
         df.columns = col_names
 
         # Replace null values with zeros
-        df.fillna(0, inplace=True)
+        df.fillna(-1, inplace=True)
 
         # Remove the brackets and parenthesis so that data can be returned as int
         for col_name in col_names:
@@ -43,7 +43,8 @@ for path in pathlib.Path("Special_eval_files").iterdir():
 
         # The Macro doesnt count anything above the maximum acceptable headway. So set anything above this to zero,
         # so it gets ignored.
-        df[df > maximum_headway_accepted] = 0
+        df[df > maximum_headway_accepted] = -1
+        df[df == 0] = -1
 
         # The Macro rounds the values. Replicate this.
         df = df+0.5
@@ -70,14 +71,14 @@ for path in pathlib.Path("Special_eval_files").iterdir():
                 continue
             elif current_row > vehicle_position_index_row:
                 for col in row[1:]:
-                    if 0 < col <= maximum_headway_accepted:
+                    if 0 <= col <= maximum_headway_accepted:
                         cumulative_discharge_rate = cumulative_discharge_rate + col
                         discharge_rate_count += 1
                     else:
                         break
             else:
                 for col in row:
-                    if 0 < col <= maximum_headway_accepted:
+                    if 0 <= col <= maximum_headway_accepted:
                         cumulative_discharge_rate = cumulative_discharge_rate + col
                         discharge_rate_count += 1
                     else:
