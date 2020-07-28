@@ -4,7 +4,6 @@ import pathlib
 import pandas as pd
 import time
 import numpy as np
-import openpyxl
 
 maximum_headway_accepted = int(input("Enter the maximum headway accepted as an integer: "))
 
@@ -34,7 +33,6 @@ for path in pathlib.Path("Special_eval_files").iterdir():
         # Remove the brackets and parenthesis so that data can be returned as int
         for col_name in col_names:
             df[col_name] = df[col_name].astype(str).str.replace("(", "-")
-            # df[col_name] = df[col_name].str.replace("]", "")
 
         # Change values containing trailing parenthesis to -1, so they get discarded in the final
         # calculation.
@@ -89,18 +87,17 @@ for path in pathlib.Path("Special_eval_files").iterdir():
         # Perform the Saturation Flow calculation
         sat_flow = round(3600 / (cumulative_discharge_rate / discharge_rate_count))
 
-        print(str(path) + " Count: " + str(discharge_rate_count) + " Total: " + str(
-            cumulative_discharge_rate) + ", Satflow: " + str(sat_flow))
+        # print(str(path) + " Count: " + str(discharge_rate_count) + " Total: " + str(
+        #     cumulative_discharge_rate) + ", Satflow: " + str(sat_flow))
 
         # Append the results per stop-line (file suffix) to a dataFrame
         results = results.append(
             {'ID': str(path)[-3:], "Saturation_flow": sat_flow, "Number of measurements": discharge_rate_count},
             ignore_index=True)
-
     except:
         print("Error on file: " + str(path))
 end = time.time()
-print(end - start)
+print(str(round(end - start)) + "Seconds runtime.")
 
 # Group the same stop-lines together using the file suffix and get the average of the Saturation flows and the total
 # number of measurements for that saturation flow.
