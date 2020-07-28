@@ -34,8 +34,16 @@ for path in pathlib.Path("Special_eval_files").iterdir():
         # Remove the brackets and parenthesis so that data can be returned as int
         for col_name in col_names:
             df[col_name] = df[col_name].astype(str).str.replace("(", "-")
-            df[col_name] = df[col_name].str.replace(")", "")
-            df[col_name] = df[col_name].str.replace("]", "")
+            # df[col_name] = df[col_name].str.replace("]", "")
+
+        # Change values containing trailing parenthesis to -1, so they get discarded in the final
+        # calculation.
+        for col in df:
+            rows = 0
+            for value in df[col]:
+                if ")" in str(value):
+                    df.at[rows, str(col)] = -1
+                rows += 1
 
         # Make the data numerical
         for col_name in col_names:
@@ -68,15 +76,8 @@ for path in pathlib.Path("Special_eval_files").iterdir():
         current_row = 0
         for row in df:
             current_row += 1
-            if current_row == vehicle_position_index_row:
+            if current_row >= vehicle_position_index_row:
                 continue
-            elif current_row > vehicle_position_index_row:
-                for col in row[1:]:
-                    if 0 <= col <= maximum_headway_accepted:
-                        cumulative_discharge_rate = cumulative_discharge_rate + col
-                        discharge_rate_count += 1
-                    else:
-                        break
             else:
                 for col in row:
                     if 0 <= col <= maximum_headway_accepted:
@@ -103,7 +104,7 @@ print(end - start)
 
 # Group the same stop-lines together using the file suffix and get the average of the Saturation flows and the total
 # number of measurements for that saturation flow.
-# results = results.groupby("ID").agg({"Saturation_flow": "mean", "Number of measurements": "sum"})
+results = results.groupby("ID").agg({"Saturation_flow": "mean", "Number of measurements": "sum"})
 
 now = datetime.now()
 
