@@ -8,13 +8,15 @@ import numpy as np
 maximum_headway_accepted = int(input("Enter the maximum headway accepted as an integer: "))
 
 start = time.time()
-results = pd.DataFrame(columns=['ID', "Saturation_flow"])
+# Declare DataFrame so that results can be appended at the end
+results = pd.DataFrame()
+# Perform algorithm on each file in "Special_eval_files" folder
 for path in pathlib.Path("Special_eval_files").iterdir():
     try:
         my_cols = [str(col) for col in range(100)]
         use_cols = my_cols[3:]  # We are only concerned with the fourth column, onwards.
 
-        # Read the file, delimeter set as space separated
+        # Read the file, delimiter set as space separated
         df = pd.read_csv(path, sep="\s+|:", names=my_cols, header=None, engine="python", skiprows=10, index_col=None,
                          usecols=use_cols)
 
@@ -97,11 +99,11 @@ for path in pathlib.Path("Special_eval_files").iterdir():
     except:
         print("Error on file: " + str(path))
 end = time.time()
-print(str(round(end - start)) + "Seconds runtime.")
+print(str(round(end - start)) + " Seconds runtime.")
 
 # Group the same stop-lines together using the file suffix and get the average of the Saturation flows and the total
 # number of measurements for that saturation flow.
-results = results.groupby("ID").agg({"Saturation_flow": "mean", "Number of measurements": "sum"})
+results = results.groupby("ID").agg({"Saturation_flow": "mean", "Number of measurements": "sum"}).round()
 
 now = datetime.now()
 
