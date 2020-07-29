@@ -17,8 +17,15 @@ for path in pathlib.Path("Special_eval_files").iterdir():
         use_cols = my_cols[3:]  # We are only concerned with the fourth column, onwards.
 
         # Read the file, using our desired columns, delimiter set as space separated.
-        df = pd.read_csv(path, sep="\s+|:", names=my_cols, header=None, engine="python", skiprows=10, index_col=None,
+        raw_data = pd.read_csv(path, sep="\s+|:", names=my_cols, header=None, engine="python", skiprows=7, index_col=None,
                          usecols=use_cols)
+
+        # Slice the numerical data from the raw data and make a copy, to avoid chained-assignment warning.
+        df = raw_data[1:].copy()
+
+        # Locate the row containing the stopline name, extract the name and remove th trailing parenthesis.
+        categorical_info = raw_data.iloc[0].copy()
+        stopline_name = categorical_info[7][:-1]
 
         # Remove excess empty columns
         df.dropna(axis="columns", how="all", inplace=True)
@@ -39,7 +46,7 @@ for path in pathlib.Path("Special_eval_files").iterdir():
         # Change values containing trailing parenthesis to -1, so they get discarded in the final
         # calculation.
         for col in df:
-            rows = 0
+            rows = 1 # Since we sliced the df, row 0 isnt present and we start on row 1.
             for value in df[col]:
                 if ")" in str(value):
                     df.at[rows, str(col)] = -1
