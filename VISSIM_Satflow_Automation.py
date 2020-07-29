@@ -97,15 +97,17 @@ for path in pathlib.Path("Special_eval_files").iterdir():
         # Perform the Saturation Flow calculation.
         sat_flow = round(3600 / (cumulative_discharge_rate / discharge_rate_count))
 
+        # Un-comment to see each file's Saturation flow
         # print(str(path) + " Count: " + str(discharge_rate_count) + " Total: " + str(
         #     cumulative_discharge_rate) + ", Satflow: " + str(sat_flow))
 
         # Append the results per stop-line (file suffix) to a dataFrame.
         results = results.append(
-            {'ID': str(path)[-3:], "Stop-line name": stopline_name, "Saturation_flow": sat_flow,
+            {'ID': str(path)[-3:], "Stop-line": stopline_name, "Saturation_flow": sat_flow,
              "Number of measurements": discharge_rate_count}, ignore_index=True)
-    except:
-        print("Error on file: " + str(path))
+    except ZeroDivisionError:
+        print("Insufficient data on file: " + str(path))
+
 end = time.time()
 print(str(round(end - start)) + " Seconds runtime.")
 
