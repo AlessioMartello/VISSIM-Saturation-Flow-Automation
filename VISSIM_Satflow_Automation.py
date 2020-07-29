@@ -8,15 +8,15 @@ import numpy as np
 maximum_headway_accepted = int(input("Enter the maximum headway accepted as an integer: "))
 
 start = time.time()
-# Declare DataFrame so that results can be appended at the end
+# Declare DataFrame so that results can be appended at the end.
 results = pd.DataFrame()
-# Perform algorithm on each file in "Special_eval_files" folder
+# Perform algorithm on each file in "Special_eval_files" folder.
 for path in pathlib.Path("Special_eval_files").iterdir():
     try:
         my_cols = [str(col) for col in range(100)]
         use_cols = my_cols[3:]  # We are only concerned with the fourth column, onwards.
 
-        # Read the file, delimiter set as space separated
+        # Read the file, using our desired columns, delimiter set as space separated.
         df = pd.read_csv(path, sep="\s+|:", names=my_cols, header=None, engine="python", skiprows=10, index_col=None,
                          usecols=use_cols)
 
@@ -45,7 +45,7 @@ for path in pathlib.Path("Special_eval_files").iterdir():
                     df.at[rows, str(col)] = -1
                 rows += 1
 
-        # Make the data numerical
+        # Make the data numerical.
         for col_name in col_names:
             df[col_name] = pd.to_numeric(df[col_name])
 
@@ -55,7 +55,7 @@ for path in pathlib.Path("Special_eval_files").iterdir():
         df[df == 0] = -1
 
         # The Macro rounds the values before performing calculations. Integers containing exactly 0.5 are rounded down.
-        # Otherwise, round to the nearest integer
+        # Otherwise, round to the nearest integer.
         df = df + 0.4999
         df = df.apply(np.floor)
 
@@ -86,13 +86,13 @@ for path in pathlib.Path("Special_eval_files").iterdir():
                     else:
                         break
 
-        # Perform the Saturation Flow calculation
+        # Perform the Saturation Flow calculation.
         sat_flow = round(3600 / (cumulative_discharge_rate / discharge_rate_count))
 
         # print(str(path) + " Count: " + str(discharge_rate_count) + " Total: " + str(
         #     cumulative_discharge_rate) + ", Satflow: " + str(sat_flow))
 
-        # Append the results per stop-line (file suffix) to a dataFrame
+        # Append the results per stop-line (file suffix) to a dataFrame.
         results = results.append(
             {'ID': str(path)[-3:], "Saturation_flow": sat_flow, "Number of measurements": discharge_rate_count},
             ignore_index=True)
