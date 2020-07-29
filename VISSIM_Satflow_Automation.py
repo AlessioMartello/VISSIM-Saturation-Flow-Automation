@@ -17,8 +17,9 @@ for path in pathlib.Path("Special_eval_files").iterdir():
         use_cols = my_cols[3:]  # We are only concerned with the fourth column, onwards.
 
         # Read the file, using our desired columns, delimiter set as space separated.
-        raw_data = pd.read_csv(path, sep="\s+|:", names=my_cols, header=None, engine="python", skiprows=7, index_col=None,
-                         usecols=use_cols)
+        raw_data = pd.read_csv(path, sep="\s+|:", names=my_cols, header=None, engine="python", skiprows=7,
+                               index_col=None,
+                               usecols=use_cols)
 
         # Slice the numerical data from the raw data and make a copy, to avoid chained-assignment warning.
         df = raw_data[1:].copy()
@@ -46,7 +47,7 @@ for path in pathlib.Path("Special_eval_files").iterdir():
         # Change values containing trailing parenthesis to -1, so they get discarded in the final
         # calculation.
         for col in df:
-            rows = 1 # Since we sliced the df, row 0 isnt present and we start on row 1.
+            rows = 1  # Since we sliced the df, row 0 isnt present and we start on row 1.
             for value in df[col]:
                 if ")" in str(value):
                     df.at[rows, str(col)] = -1
@@ -101,8 +102,8 @@ for path in pathlib.Path("Special_eval_files").iterdir():
 
         # Append the results per stop-line (file suffix) to a dataFrame.
         results = results.append(
-            {'ID': str(path)[-3:], "Saturation_flow": sat_flow, "Number of measurements": discharge_rate_count},
-            ignore_index=True)
+            {'ID': str(path)[-3:], "Stop-line name": stopline_name, "Saturation_flow": sat_flow,
+             "Number of measurements": discharge_rate_count}, ignore_index=True)
     except:
         print("Error on file: " + str(path))
 end = time.time()
@@ -110,7 +111,7 @@ print(str(round(end - start)) + " Seconds runtime.")
 
 # Group the same stop-lines together using the file suffix and get the average of the Saturation flows and the total
 # number of measurements for that saturation flow.
-results = results.groupby("ID").agg({"Saturation_flow": "mean", "Number of measurements": "sum"}).round()
+results = results.groupby(["ID", "Stop-line"]).agg({"Saturation_flow": "mean", "Number of measurements": "sum"}).round()
 
 now = datetime.now()
 
