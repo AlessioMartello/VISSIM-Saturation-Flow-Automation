@@ -11,7 +11,7 @@ start = time.time()
 # Declare DataFrame so that results can be appended at the end.
 results = pd.DataFrame()
 # Perform algorithm on each file in "Special_eval_files" folder.
-for path in pathlib.Path("Special_eval_files_Mayfair").iterdir():
+for path in pathlib.Path("Special_eval_files").iterdir():
     try:
         my_cols = [str(col) for col in range(100)]
         use_cols = my_cols[3:]  # We are only concerned with the fourth column, onwards.
@@ -115,6 +115,15 @@ print(str(round(end - start)) + " Seconds runtime.")
 # number of measurements for that saturation flow.
 results = results.groupby(["ID", "Stop-line"]).agg({"Saturation_flow": "mean", "Number of measurements": "sum"}).round()
 
+# Extract the project name from line 5 of any file and save to a variable
+df = pd.read_csv(path, sep="\s+|:", header=None, engine="python", skiprows=4,
+                 index_col=None, nrows=1)
+
+df = df.iloc[:, 2:]
+df = df.astype("string")
+df = df.values.tolist()[0]
+project_name = " ".join(df)
+
 now = datetime.now()
 
-results.to_excel("Satflow_results_" + now.strftime("%d-%m_%H.%M") + ".xlsx")
+results.to_excel(str(project_name) + "_Satflow_" + now.strftime("%d-%m_%H.%M") + ".xlsx")
