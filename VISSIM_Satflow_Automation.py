@@ -11,7 +11,7 @@ start = time.time()
 # Declare DataFrame so that results can be appended at the end.
 results = pd.DataFrame()
 # Perform algorithm on each file in "Special_eval_files" folder.
-for path in pathlib.Path("Special_eval_files_Mayfair").iterdir():
+for path in pathlib.Path("Special_eval_files").iterdir():
     try:
         my_cols = [str(col) for col in range(100)]
         use_cols = my_cols[3:]  # We are only concerned with the fourth column, onwards.
@@ -122,9 +122,7 @@ df = pd.read_csv(path, sep="\s+|:", header=None, engine="python", skiprows=4,
 df = df.values.tolist()[0]
 project_name = []
 for element in df:
-    if element == "Comment":
-        continue
-    elif type(element) == str:
+    if element != "Comment" and type(element) == str:
         project_name.append(element)
 project_name = " ".join(project_name)
 
