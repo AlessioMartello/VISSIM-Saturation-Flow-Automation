@@ -11,7 +11,7 @@ start = time.time()
 # Declare DataFrame so that results can be appended at the end.
 results = pd.DataFrame()
 # Perform algorithm on each file in "Special_eval_files" folder.
-for path in pathlib.Path("Special_eval_files").iterdir():
+for path in pathlib.Path("Special_eval_files_Mayfair").iterdir():
     try:
         my_cols = [str(col) for col in range(100)]
         use_cols = my_cols[3:]  # We are only concerned with the fourth column, onwards.
@@ -119,10 +119,14 @@ results = results.groupby(["ID", "Stop-line"]).agg({"Saturation_flow": "mean", "
 df = pd.read_csv(path, sep="\s+|:", header=None, engine="python", skiprows=4,
                  index_col=None, nrows=1)
 
-df = df.iloc[:, 2:]
-df = df.astype("string")
 df = df.values.tolist()[0]
-project_name = " ".join(df)
+project_name = []
+for element in df:
+    if element == "Comment":
+        continue
+    elif type(element) == str:
+        project_name.append(element)
+project_name = " ".join(project_name)
 
 now = datetime.now()
 
