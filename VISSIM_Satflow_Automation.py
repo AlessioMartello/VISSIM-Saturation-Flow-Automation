@@ -5,13 +5,13 @@ import pandas as pd
 import time
 import numpy as np
 
-maximum_headway_accepted = int(input("Enter the maximum headway accepted as an integer: "))
+maximum_headway_accepted = float(input("Enter the maximum headway accepted as an integer: "))
 
 start = time.time()
 # Declare DataFrame so that results can be appended at the end.
 results = pd.DataFrame()
 # Perform algorithm on each file in "Special_eval_files" folder.
-for path in pathlib.Path("Special_eval_files").iterdir():
+for path in pathlib.Path("Special_eval_files_Mayfair").iterdir():
     try:
         my_cols = [str(col) for col in range(100)]
         use_cols = my_cols[3:]  # We are only concerned with the fourth column, onwards.
@@ -47,7 +47,7 @@ for path in pathlib.Path("Special_eval_files").iterdir():
         # Change values containing trailing parenthesis to -1, so they get discarded in the final
         # calculation.
         for col in df:
-            rows = 1  # Since we sliced the df, row 0 isnt present and we start on row 1.
+            rows = 1  # Since we sliced the df, row 0 is not present and we start on row 1.
             for value in df[col]:
                 if ")" in str(value):
                     df.at[rows, str(col)] = -1
