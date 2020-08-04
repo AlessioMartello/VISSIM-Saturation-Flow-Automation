@@ -117,7 +117,7 @@ results = results.groupby(["ID", "Stop-line"]).agg({"Saturation_flow": "mean", "
 
 # Extract the project name from line 5 of any file and save to a variable
 df = pd.read_csv(path, sep="\s+|:", header=None, engine="python", skiprows=4,
-                 index_col=None, nrows=1)
+                 index_col=False, nrows=1)
 
 df = df.values.tolist()[0]
 project_name = [element for element in df if element != "Comment" and type(element) == str]
