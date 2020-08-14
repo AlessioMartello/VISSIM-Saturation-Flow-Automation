@@ -105,8 +105,8 @@ for path in pathlib.Path("Special_eval_files").iterdir():
 
         # Append the results per stop-line (file suffix) to a dataFrame.
         summary_results = summary_results.append(
-            {'ID': str(path)[-3:], "Stop-line": stopline_name, "Saturation flow": sat_flow,
-             "Number of measurements": discharge_rate_count}, ignore_index=True)
+            {'ID': str(path)[-3:], "Stop-line": stopline_name,"Number of measurements": discharge_rate_count,
+             "Saturation flow": sat_flow}, ignore_index=True)
     except ZeroDivisionError:
         ignored_results = ignored_results.append(
             {'File': path, "Number of measurements": discharge_rate_count}, ignore_index=True)
