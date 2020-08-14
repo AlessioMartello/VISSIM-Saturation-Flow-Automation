@@ -8,9 +8,10 @@ import numpy as np
 maximum_headway_accepted = float(input("Enter the maximum headway accepted as an integer: "))
 
 start = time.time()
-# Declare DataFrame so that results can be appended at the end.
+# Declare DataFrames so that results can be appended at the end.
 results = pd.DataFrame()
 summary_results = pd.DataFrame()
+ignored_results = pd.DataFrame()
 # Perform algorithm on each file in "Special_eval_files" folder.
 for path in pathlib.Path("Special_eval_files").iterdir():
     try:
@@ -99,23 +100,24 @@ for path in pathlib.Path("Special_eval_files").iterdir():
         sat_flow = round(3600 / (cumulative_discharge_rate / discharge_rate_count))
 
         # Un-comment to see each file's Saturation flow
-        results= results.append({"File": path, "Count": discharge_rate_count,
-            "Satflow" : sat_flow}, ignore_index=True)
+        results = results.append({"File": path, "Count": discharge_rate_count,
+                                  "Saturation flow": sat_flow}, ignore_index=True)
 
         # Append the results per stop-line (file suffix) to a dataFrame.
         summary_results = summary_results.append(
-            {'ID': str(path)[-3:], "Stop-line": stopline_name, "Saturation_flow": sat_flow,
+            {'ID': str(path)[-3:], "Stop-line": stopline_name, "Saturation flow": sat_flow,
              "Number of measurements": discharge_rate_count}, ignore_index=True)
     except ZeroDivisionError:
-        # print("Insufficient data on file: " + str(path))
-        print("")
+        ignored_results = ignored_results.append(
+            {'File': path, "Number of measurements": discharge_rate_count}, ignore_index=True)
 
 end = time.time()
 print(str(round(end - start)) + " Seconds runtime.")
 
 # Group the same stop-lines together using the file suffix and get the average of the Saturation flows and the total
 # number of measurements for that saturation flow.
-results_grouped = summary_results.groupby(["ID", "Stop-line"]).agg({"Saturation_flow": "mean", "Number of measurements": "sum"}).round()
+results_grouped = summary_results.groupby(["ID", "Stop-line"]).agg(
+    {"Saturation flow": "mean", "Number of measurements": "sum"}).round()
 
 # Extract the project name from line 5 of any file and save to a variable
 df = pd.read_csv(path, sep="\s+|:", header=None, engine="python", skiprows=4,
@@ -129,5 +131,6 @@ now = datetime.now()
 
 writer = pd.ExcelWriter(str(project_name) + "_Satflow_" + now.strftime("%d-%m_%H.%M") + ".xlsx")
 results_grouped.to_excel(writer, "Summary results")
-results.to_excel(writer,"File results")
+results.to_excel(writer, "All results", index=False)
+ignored_results.to_excel(writer, "Ignored files", index=False)
 writer.save()
