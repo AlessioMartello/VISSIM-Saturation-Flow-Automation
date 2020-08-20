@@ -3,6 +3,7 @@ from datetime import datetime
 import pathlib
 import pandas as pd
 import time
+import numpy as np
 
 maximum_headway_accepted = float(input("Enter the maximum headway accepted as an integer: "))
 
@@ -67,6 +68,11 @@ for path in pathlib.Path("Special_eval_files").iterdir():
         # to -1, so it gets ignored. The same goes for pre-existing zeros.
         df[df >= maximum_headway_accepted] = -1
         df[df == 0] = -1
+
+        # The Macro rounds the values before performing calculations. Integers containing exactly 0.5 are rounded down.
+        # Otherwise, round to the nearest integer.
+        df = df + 0.4999
+        df = df.apply(np.floor)
 
         # Convert to numpy array for easier and faster manipulation.
         df = df.to_numpy()
