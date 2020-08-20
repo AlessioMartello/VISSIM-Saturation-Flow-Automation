@@ -19,7 +19,6 @@ for path in pathlib.Path("Special_eval_files").iterdir():
 
         # Read the file, using our desired columns, delimiter set as space separated.
         raw_data = pd.read_csv(path, sep="\s+|:", names=my_cols, header=None, engine="python", skiprows=7,
-                               index_col=None,
                                usecols=use_cols)
 
         # Slice the numerical data from the raw data and make a copy, to avoid chained-assignment warning.
@@ -27,7 +26,7 @@ for path in pathlib.Path("Special_eval_files").iterdir():
 
         # Locate the row containing the stopline name, extract the name and remove th trailing parenthesis.
         categorical_info = raw_data.iloc[0].copy()
-        stopline_name = categorical_info[7][:-1]
+        stopline_name = int(categorical_info[7][:-1])
 
         # Remove excess empty columns
         df.dropna(axis="columns", how="all", inplace=True)
