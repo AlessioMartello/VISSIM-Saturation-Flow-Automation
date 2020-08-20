@@ -6,6 +6,13 @@ import time
 
 maximum_headway_accepted = float(input("Enter the maximum headway accepted as an integer: "))
 
+# Define a function to load data from the Special_evaluation_format
+def load_VISSIM_file(columns=None, use_cols=None, skiprows=0, nrows=None, index_col=None):
+    raw_data = pd.read_csv(path, sep="\s+|:", names=columns, header=None, engine="python", skiprows=skiprows,
+                           usecols=use_cols, index_col=index_col, nrows=nrows)
+    return raw_data
+
+
 start = time.time()
 # Declare DataFrames so that results can be appended at the end.
 results = pd.DataFrame()
@@ -14,12 +21,11 @@ ignored_results = pd.DataFrame()
 # Perform algorithm on each file in "Special_eval_files" folder.
 for path in pathlib.Path("Special_eval_files").iterdir():
     try:
-        my_cols = [str(col) for col in range(100)]
-        use_cols = my_cols[3:]  # We are only concerned with the fourth column, onwards.
+        all_cols = [str(col) for col in range(100)]
+        use_cols = all_cols[3:]  # We are only concerned with the fourth column, onwards.
 
         # Read the file, using our desired columns, delimiter set as space separated.
-        raw_data = pd.read_csv(path, sep="\s+|:", names=my_cols, header=None, engine="python", skiprows=7,
-                               usecols=use_cols)
+        raw_data = load_VISSIM_file(all_cols, use_cols, 7)
 
         # Slice the numerical data from the raw data and make a copy, to avoid chained-assignment warning.
         df = raw_data[1:].copy()
@@ -98,7 +104,7 @@ for path in pathlib.Path("Special_eval_files").iterdir():
 
         # Append the results per stop-line (file suffix) to a dataFrame.
         summary_results = summary_results.append(
-            {'ID': str(path)[-3:], "Stop-line": stopline_name,"Number of measurements": discharge_rate_count,
+            {'ID': str(path)[-3:], "Stop-line": stopline_name, "Number of measurements": discharge_rate_count,
              "Saturation flow": sat_flow}, ignore_index=True)
 
     except ZeroDivisionError:
@@ -114,8 +120,7 @@ results_grouped = summary_results.groupby(["ID", "Stop-line"]).agg(
     {"Saturation flow": "mean", "Number of measurements": "sum"}).round()
 
 # Extract the project name from line 5 of any file and save to a variable
-df = pd.read_csv(path, sep="\s+|:", header=None, engine="python", skiprows=4,
-                 index_col=False, nrows=1)
+df = load_VISSIM_file(None, None, 4, 1, False)
 
 df = df.values.tolist()[0]
 project_name = [element for element in df if element != "Comment" and type(element) == str]
